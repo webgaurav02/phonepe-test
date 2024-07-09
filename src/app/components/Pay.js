@@ -24,9 +24,9 @@ const Pay = () => {
             merchantTransactionId: transactionid,
             merchantUserId: 'MUID-' + uuidv4().toString(36).slice(-6),
             amount: 10000,
-            redirectUrl: `http://localhost:3000/api/status/${transactionid}`,
+            redirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/status/${transactionid}`,
             redirectMode: "POST",
-            callbackUrl: `http://localhost:3000/api/status/${transactionid}`,
+            callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/status/${transactionid}`,
             mobileNumber: '9999999999',
             paymentInstrument: {
                 type: "PAY_PAGE",

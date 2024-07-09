@@ -7,7 +7,7 @@ import axios from "axios";
 // Initialize the cors middleware
 const cors = initMiddleware(
     Cors({
-        origin: 'http://localhost:3000',
+        origin: process.env.NEXT_PUBLIC_SITE_URL,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     })
@@ -43,17 +43,17 @@ export async function POST(req, res) {
         console.log("r===", response.data.code);
 
         if (response.data.code === "PAYMENT_SUCCESS") {
-            return NextResponse.redirect("http://localhost:3000/success", {
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/success`, {
                 status: 301,
             });
         } else {
-            return NextResponse.redirect("http://localhost:3000/failure", {
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/failure`, {
                 status: 301,
             });
         }
     } catch (error) {
         console.error("Payment status request error: ", error.response ? error.response.data : error.message);
-        return NextResponse.redirect("http://localhost:3000/failure", {
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/failure`, {
             status: 301,
         });
     }
