@@ -1,60 +1,51 @@
-import { initMiddleware } from '@/lib/init-middleware';
-import Cors from 'cors';
 import { NextResponse } from "next/server";
 import sha256 from "crypto-js/sha256";
 import axios from "axios";
 
-// Initialize the cors middleware
-const cors = initMiddleware(
-    Cors({
-        origin: process.env.NEXT_PUBLIC_SITE_URL,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
-    })
-);
-
-
 export async function POST(req, res) {
+    const data = await req.formData();
+    console.log(data);
+    const status = data.get("code");
+    const merchantId = data.get("merchantId");
+    const transactionId = data.get("transactionId");
 
-    await cors(req, res);
-
-    const { code, merchantId, transactionId } = await req.json();
-
-    const salt = process.env.NEXT_PUBLIC_SALT_KEY;
-    const fullURL = `/pg/v1/status/${merchantId}/${transactionId}${salt}`;
-    const dataSha256 = sha256(fullURL).toString();
+    // const st =
+    //     `/pg/v1/status/${merchantId}/${transactionId}` +
+    //     process.env.NEXT_PUBLIC_SALT_KEY;
+    // console.log(st)
+    const fullURL = `${dataBase64}/pg/v1/pay${process.env.NEXT_PUBLIC_SALT_KEY}`;
+    const dataSha256 = sha256(fullURL);
 
     const checksum = `${dataSha256}###${process.env.NEXT_PUBLIC_SALT_INDEX}`;
     console.log(checksum);
 
+
+
+
     const options = {
         method: "GET",
-        url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${transactionId}`,
+        url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${transactionId}`,
         headers: {
             accept: "application/json",
             "Content-Type": "application/json",
             "X-VERIFY": checksum,
-            "X-MERCHANT-ID": merchantId,
+            "X-MERCHANT-ID": `${merchantId}`,
         },
     };
 
-    try {
-        const response = await axios.request(options);
-        console.log("r===", response.data.code);
+    // CHECK PAYMENT STATUS
+    const response = await axios.request(options);
+    console.log("r===", response.data.code);
 
-        if (response.data.code === "PAYMENT_SUCCESS") {
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/success`, {
-                status: 301,
-            });
-        } else {
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/failure`, {
-                status: 301,
-            });
-        }
-    } catch (error) {
-        console.error("Payment status request error: ", error.response ? error.response.data : error.message);
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/failure`, {
+
+    if (response.data.code == "PAYMENT_SUCCESS")
+        return NextResponse.redirect("http://localhost:3000/success", {
             status: 301,
         });
-    }
+    else return NextResponse.redirect("http://localhost:3000/failure", {
+        // a 301 status is required to redirect from a POST to a GET route
+        status: 301,
+    });
+
+
 }

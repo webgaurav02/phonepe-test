@@ -20,14 +20,14 @@ const Pay = () => {
         const transactionid = "Tr-" + uuidv4().toString(36).slice(-6);
 
         const payload = {
-            merchantId: 'M227J0BC2IGYQ',
+            merchantId: 'PGTESTPAYUAT',
             merchantTransactionId: transactionid,
-            merchantUserId: 'MUID-' + uuidv4().toString(36).slice(-6),
+            merchantUserId: 'OB-' + uuidv4().toString(36).slice(-6),
             amount: 10000,
-            redirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/status/${transactionid}`,
+            redirectUrl: `http://localhost:3000/api/status/${transactionid}`,
             redirectMode: "POST",
-            callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/status/${transactionid}`,
-            mobileNumber: '9999999999',
+            callbackUrl: `http://localhost:3000/api/status/${transactionid}`,
+            mobileNumber: '8415031939',
             paymentInstrument: {
                 type: "PAY_PAGE",
             },
@@ -39,7 +39,7 @@ const Pay = () => {
         const dataBase64 = Buffer.from(dataPayload).toString("base64");
         console.log(dataBase64);
 
-        const salt = '24da7cf7-2776-4494-890a-1b13627baa86'; // Replace with your actual salt value
+        const salt = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399'; // Replace with your actual salt value
         const fullURL = `${dataBase64}/pg/v1/pay${salt}`;
         const dataSha256 = sha256(fullURL).toString();
         console.log(dataSha256);
@@ -50,7 +50,9 @@ const Pay = () => {
         const UAT_PAY_API_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
 
         try {
-            const response = await axios.post(UAT_PAY_API_URL, payload, {
+            const response = await axios.post(UAT_PAY_API_URL, {
+                request: dataBase64
+            }, {
                 headers: {
                     accept: "application/json",
                     "Content-Type": "application/json",
